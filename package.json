@@ -1,0 +1,22 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "prisma": "^5.11.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.11.0",
+    "ts-node": "^10.9.2"
+  },
+  "name": "database_converting",
+  "version": "1.0.0",
+  "description": "You can convert PlanetScale database to Supabase one",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "convert": "node prisma/converting.js",
+    "post_convert": "node prisma/post_converting.js",
+    "generate": "npx prisma generate --schema=./prisma/planetscale/schema.prisma && npx prisma generate --schema=./prisma/supabase/schema.prisma"
+  },
+  "author": "Vladyslav",
+  "license": "ISC"
+}

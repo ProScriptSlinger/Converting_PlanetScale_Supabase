@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/planetscale"
+}
+
+datasource db_planetscale {
+  provider = "mysql"
+  url      = env("DATABASE_URL_PLANETSCALE")
+}
+
+model Account {
+  id                String  @id
+  provider          String
+  providerAccountId String
+  refreshToken      String?
+  accessToken       String?
+  expiresAt         Int?
+  userId            String
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Block {
+  blockerId  String
+  blockingId String
+
+  @@id([blockerId, blockingId])
+  @@index([blockerId])
+  @@index([blockingId])
+}
+
+model EnrolledEvent {
+  id     String   @id
+  name   String
+  slug   String
+  start  DateTime @default(now())
+  end    DateTime
+  userId String
+
+  @@index([userId])
+}
+
+model Flag {
+  comment   String?
+  resolved  Boolean  @default(false)
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+
+  @@id([postId, userId])
+  @@index([postId])
+  @@index([postId, userId])
+  @@index([userId])
+}
+
+model Like {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+
+  @@id([postId, userId])
+  @@index([postId])
+  @@index([postId, userId])
+  @@index([userId])
+}
+
+model Post {
+  id            String   @id
+  content       String   @db_planetscale.Text
+  createdBy     String?
+  baseLikeCount Int?
+  parentId      String?
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+
+  @@index([id, userId])
+  @@index([parentId])
+  @@index([userId])
+}
+
+model Prompt {
+  id      String @id
+  content String @db_planetscale.Text
+}
+
+model Token {
+  id        String     @id
+  token     String
+  type      Token_type
+  expiresAt DateTime?
+  sentTo    String?
+  usedAt    DateTime?
+  userId    String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+
+  @@unique([token, type])
+  @@index([userId])
+}
+
+model User {
+  id                String    @id
+  email             String?   @unique
+  emailVerified     DateTime?
+  displayName       String?
+  displayImage      String?
+  weeklyDigestEmail Boolean   @default(false)
+  role              User_role @default(USER)
+  passwordHash      String?
+  createdAt         DateTime  @default(now())
+  disabled          Boolean?
+}
+
+enum Token_type {
+  REFRESH_TOKEN
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+enum User_role {
+  USER
+  ADMIN
+}
