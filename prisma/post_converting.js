@@ -10,8 +10,8 @@ const supaPrisma = new PrismaClientSupabase();
 function displayProgressBar(current, total) {
   const progressBarLength = 50;
   const percentage = current / total;
-  const filledLength = Math.round(progressBarLength * percentage);
-  const emptyBarLength = progressBarLength - filledLength;
+  const filledLength = Math.max(0, Math.round(progressBarLength * percentage));
+  const emptyBarLength = Math.max(0, progressBarLength - filledLength);
   const filledBar = "█".repeat(filledLength);
   const emptyBar = "-".repeat(emptyBarLength);
   const displayPercentage = (percentage * 100).toFixed(2);
@@ -43,14 +43,23 @@ async function createPostAndParentPosts(parentId) {
   });
 
   if (!existing) {
+  }
+  try {
     await supaPrisma.post.create({
       data: {
         ...parentPost,
         parentId: createdId,
       },
     });
+  } catch (error) {
+    if (error.code === "P2002") {
+      // Handle duplicate record by possibly logging it or ignoring it, as per your requirement.
+      // console.warn(`Duplicate record found for ${modelName}:`, record.id);
+    } else {
+      // Handle other errors normally.
+      console.error(`Error creating record in ${modelName}:`, error);
+    }
   }
-
   return parentId;
 }
 
