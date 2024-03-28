@@ -72,6 +72,11 @@ async function convertRecords(modelName, totalCount) {
   displayProgressBar(skip, totalCount);
   while (skip < totalCount) {
     const records = await prisma[modelName].findMany({
+      where: {
+        createdAt: {
+          gte: new Date("2024-03-20"), // Latest date
+        },
+      },
       take: chunkSize,
       skip: skip,
     });
